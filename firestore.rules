@@ -1,0 +1,56 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Suggestions ──
+    match /suggestions/{docId} {
+      allow create: if
+        request.resource.data.keys().hasAll(['name', 'email', 'message', 'createdAt', 'read'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 5000
+        && request.resource.data.createdAt is string
+        && request.resource.data.read == false;
+
+      allow read, update, delete: if request.auth.token.admin == true;
+    }
+
+    // ── Push subscriptions ──
+    match /pushSubscriptions/{docId} {
+      allow create: if
+        request.resource.data.keys().hasAll(['token', 'createdAt'])
+        && request.resource.data.token is string
+        && request.resource.data.token.size() <= 512
+        && request.resource.data.createdAt is string;
+
+      allow read, update, delete: if false;
+    }
+
+    // ── Email subscribers ──
+    match /emailSubscribers/{docId} {
+      allow create: if
+        request.resource.data.keys().hasAll(['email', 'subscribedAt', 'confirmed'])
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.subscribedAt is string
+        && request.resource.data.confirmed == false;
+
+      allow read, update, delete: if request.auth.token.admin == true;
+    }
+
+    // ── Projects ──
+    match /projects/{docId} {
+      allow read: if true;
+      allow create: if request.auth.token.admin == true;
+      allow delete: if request.auth.token.admin == true;
+      allow update: if request.auth.token.admin == true
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(["likes"])
+            && (request.resource.data.likes == resource.data.likes + 1
+                || request.resource.data.likes == resource.data.likes - 1));
+    }
+  }
+}

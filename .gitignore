@@ -1,0 +1,12 @@
+.env
+.env.local
+.env.*.local
+
+node_modules/
+.next/
+out/
+
+*.tsbuildinfo
+
+# Firebase service account (secret — full admin access)
+manudevlog-firebase-adminsdk-fbsvc-3656f64ab1.json
