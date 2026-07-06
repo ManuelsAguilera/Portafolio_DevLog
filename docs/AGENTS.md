@@ -86,16 +86,19 @@ npx tsx scripts/seed-projects.ts
 ## Build / Dev workflow
 
 - **`npm run dev`** — development server with hot reload (default workflow).
-- **`npm run build`** — production build. Generates `.next/` artifacts that conflict with `dev`. Only run when explicitly testing production output.
-- **`.next` cache corruption** — if switching between `build` and `dev`, or if weird compilation errors appear, delete `.next` and restart:
+- **`npm run build`** — production build (Node.js output). Only used for local verification.
+- **`npm run deploy`** — builds via OpenNext for Cloudflare Workers runtime and deploys.
+- **`npm run preview`** — builds and serves locally in the Workers runtime (closer to production than `next dev`).
+- **`.next` / `.open-next` cache corruption** — if switching between `build` and `dev`, or if weird compilation errors appear, delete these directories and restart:
   ```powershell
-  Remove-Item -Recurse -Force .next
+  Remove-Item -Recurse -Force .next, .open-next
   npm run dev
   ```
 - **Verification without build artifacts:** use `npx tsc --noEmit` for type-checking without generating `.next/`.
+- **Deployment:** Push to `master` — Workers Builds (Cloudflare) runs `npm run deploy` automatically. Env vars must be set in both "Build variables" and "Settings → Variables" in the Cloudflare dashboard.
 
 ## Security notes
 
-- **`.next/` was tracked in git** — run `git rm --cached -r .next/` if switching branches causes dirty `.next/` diffs.
+- **`.next/` and `node_modules/` were previously tracked in git** — removed via `git rm --cached`. If they reappear in status, untrack them.
 - **`scripts/create-admin.ts` previously had a hardcoded password** — now fixed to read from `ADMIN_PASSWORD` env var or CLI arg. If you forked before the fix, rotate the exposed password in Firebase Console.
 - **`public/firebase-messaging-sw.js` hardcodes Firebase config** — this is standard for FCM service workers (no `process.env` access). Config values are public by Firebase design.
