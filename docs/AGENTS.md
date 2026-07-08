@@ -86,16 +86,15 @@ npx tsx scripts/seed-projects.ts
 ## Build / Dev workflow
 
 - **`npm run dev`** — development server with hot reload (default workflow).
-- **`npm run build`** — production build (Node.js output). Only used for local verification.
-- **`npm run deploy`** — builds via OpenNext for Cloudflare Workers runtime and deploys.
-- **`npm run preview`** — builds and serves locally in the Workers runtime (closer to production than `next dev`).
-- **`.next` / `.open-next` cache corruption** — if switching between `build` and `dev`, or if weird compilation errors appear, delete these directories and restart:
+- **`npm run build`** — production build.
+- **`npm run start`** — start production server locally.
+- **`.next` cache corruption** — if switching between `build` and `dev`, or if weird compilation errors appear, delete this directory and restart:
   ```powershell
-  Remove-Item -Recurse -Force .next, .open-next
+  Remove-Item -Recurse -Force .next
   npm run dev
   ```
 - **Verification without build artifacts:** use `npx tsc --noEmit` for type-checking without generating `.next/`.
-- **Deployment:** Push to `master` — Workers Builds (Cloudflare) runs `npm run deploy` automatically. Env vars must be set in both "Build variables" and "Settings → Variables" in the Cloudflare dashboard.
+- **Deployment:** Push to `main`/`master` — Vercel auto-detects Next.js and deploys. Env vars must be set in the Vercel dashboard (Project → Settings → Environment Variables).
 
 ## Security notes
 
